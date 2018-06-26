@@ -1,30 +1,32 @@
 {
-  "name": "payment",
+  "name": "coupon",
   "version": "1.0.0",
   "description": "mobile money transfer system back-end",
   "dependencies": {
-    "body-parser": "1.17.1",
-    "express": "4.15.2",
-    "express-logger": "0.0.3",
+    "body-parser": "^1.18.3",
     "cookie-parser": "1.4.3",
-    "express-session": "1.15.2",
-    "oracledb": "1.13.1",
-    "helmet": "3.5.0",
+    "express": "4.16.0",
+    "express-logger": "0.0.3",
+    "express-myconnection": "1.0.4",
+    "express-session": "^1.15.6",
+    "helmet": "^3.12.1",
+    "mobile-detect": "^1.4.2",
+    "mysql": "2.15.0",
     "randomstring": "1.1.5",
-    "request": "2.81.0"
+    "request": "^2.87.0"
   },
   "scripts": {
     "start": "node app.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ismartdevteam/payment.git"
+    "url": "git+https://github.com/ismartdevteam/coupon.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ismartdevteam/payment/issues"
+    "url": "https://github.com/ismartdevteam/coupon/issues"
   },
-  "homepage": "https://github.com/ismartdevteam/payment#readme",
+  "homepage": "https://github.com/ismartdevteam/coupon#readme",
   "main": "app.js",
   "devDependencies": {},
   "author": "Ulziiburen"

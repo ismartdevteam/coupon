@@ -1,48 +1,50 @@
 var httprequest = require('request');
-exports.getBankList = function (request, res) {
+var MobileDetect = require('mobile-detect');
+exports.getCoupon = function (request, res) {
+md = new MobileDetect(request.headers['user-agent']);
+  res.send("Hi to "+md.os() + md.is('iPhone')+" User");
+	// var auth = request.get('auth');
+	// var sessionToken = request.get('sessionToken');
+	// var user_id = request.body.user_id;
+	// var api_key = request.body.api_key;
+	// var currentmillis = request.body.currentmillis;
 
-	var auth = request.get('auth');
-	var sessionToken = request.get('sessionToken');
-	var user_id = request.body.user_id;
-	var api_key = request.body.api_key;
-	var currentmillis = request.body.currentmillis;
-
-	if (typeof api_key !== 'undefined' && typeof user_id !== 'undefined' && typeof sessionToken !== 'undefined' &&  typeof auth !== 'undefined'  && typeof currentmillis !== 'undefined') {
-		var bindvarsapi = {
-			p_key: api_key+currentmillis,
-			p_session:sessionToken,
-			p_user_id:user_id,
-			p_auth: auth,
-			res: {type: 2001,dir: 3003},
-			code: {type: 2001,dir: 3003},
-			message: {type: 2001,dir: 3003}
-		};
-		request.getConnection(function (err, connection) {
-			if (err) {
-				res.json(constant.setResponse(500, err.message, null));
-				return;
-			}
-			connection.execute(
-				"BEGIN check_api(:p_key,:p_session,:p_user_id,:p_auth,:res,:code,:message); END; ",
-				bindvarsapi,
-				function (err, result) {
-				if (err) {
-					res.json(constant.setResponse(501, err.message, null));
-					return;
-				}
-				if (result.outBinds.code == '200') {
+	// if (typeof api_key !== 'undefined' && typeof user_id !== 'undefined' && typeof sessionToken !== 'undefined' &&  typeof auth !== 'undefined'  && typeof currentmillis !== 'undefined') {
+	// 	var bindvarsapi = {
+	// 		p_key: api_key+currentmillis,
+	// 		p_session:sessionToken,
+	// 		p_user_id:user_id,
+	// 		p_auth: auth,
+	// 		res: {type: 2001,dir: 3003},
+	// 		code: {type: 2001,dir: 3003},
+	// 		message: {type: 2001,dir: 3003}
+	// 	};
+	// 	request.getConnection(function (err, connection) {
+	// 		if (err) {
+	// 			res.json(constant.setResponse(500, err.message, null));
+	// 			return;
+	// 		}
+	// 		connection.execute(
+	// 			"BEGIN check_api(:p_key,:p_session,:p_user_id,:p_auth,:res,:code,:message); END; ",
+	// 			bindvarsapi,
+	// 			function (err, result) {
+	// 			if (err) {
+	// 				res.json(constant.setResponse(501, err.message, null));
+	// 				return;
+	// 			}
+	// 			if (result.outBinds.code == '200') {
 					
 						
 
-				} else {
-					res.json(constant.setResponse(result.outBinds.code, result.outBinds.message, null));
-					return;
-				}
-			});
-		})
-	} else {
-		res.json(constant.setResponse(504, null, null));
-	}
+	// 			} else {
+	// 				res.json(constant.setResponse(result.outBinds.code, result.outBinds.message, null));
+	// 				return;
+	// 			}
+	// 		});
+	// 	})
+	// } else {
+	// 	res.json(constant.setResponse(504, null, null));
+	// }
 }
 
 exports.getAccntBalance = function (request, res) {

@@ -1,29 +1,20 @@
-var express = require("express");
-var logger = require("express-logger");
-var session = require("express-session");
-var bodyParser = require("body-parser");
+let express = require("express");
+let logger = require("express-logger");
+let session = require("express-session");
+let bodyParser = require("body-parser");
+myConnection = require('express-myconnection');
 
-var helmet = require('helmet');
-
-var app = express();
-
-var oracledb = require('oracledb');
-var dbConfig = require('./dbconfig.js');
- oracleMiddle = require('./oracle-middle.js');
-
-dbOptions = {
-	user: dbConfig.user,
-	password: dbConfig.password,
-	connectString: dbConfig.connectString};
-console.log(dbOptions);
-
-var userFunctions = require('./user/userFunctions');
-var mainServices = require('./user/services');
-app.use(oracleMiddle(oracledb,dbOptions,'pool'))
+let helmet = require('helmet');
+let mainServices = require('./routes/services');
+let vendorServices = require('./routes/vendorFunctions');
+let mysql      = require('mysql');
+dbOptions = require('./utils/dbconfig.js');
+let app = express();
+app.use(myConnection(mysql, dbOptions, 'request'));
 
 app.use(logger({path: "/logs/logfile.txt"}));  
 
-app.use(bodyParser.json()) 
+app.use(bodyParser.json()) ;
 
 app.set('trust proxy', 1) ;
 app.use(session({
@@ -34,21 +25,18 @@ app.use(session({
 
 }));
 
-
 app.get('/', function(req, res){
 	res.send('hello world');
 });
+app.get("/vendor/login",vendorServices.login);
+app.get("/vendor/addProduct",vendorServices.addProduct);
+app.get("/getCoupon",mainServices.getCoupon);
+// app.post("/user/getBankAccounts",userFunctions.getBankAccounts);
 app.get('*', function(req, res){
 	res.send('hello world');
 });
-app.post("/getBankList",mainServices.getBankList);
-app.post("/user/addAccount",userFunctions.addAccount);
 
-// app.post("/user/getBankAccounts",userFunctions.getBankAccounts);
-
-
-
-var port = process.env.PORT || 8989;
+let port = process.env.PORT || 8989;
 app.listen(port, function() {
 	console.log("Listening on " + port);
 });
