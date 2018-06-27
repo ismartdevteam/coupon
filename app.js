@@ -12,7 +12,6 @@ dbOptions = require('./utils/dbconfig.js');
 let app = express();
 app.use(myConnection(mysql, dbOptions, 'request'));
 
-app.use(logger({path: "/logs/logfile.txt"}));  
 
 app.use(bodyParser.json()) ;
 
