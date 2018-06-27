@@ -29,9 +29,11 @@ app.get('/', function(req, res){
 	res.send('hello world');
 });
 app.get("/vendor/login",vendorServices.login);
-app.get("/vendor/addProduct",vendorServices.addProduct);
+app.get("/vendor/addorUpdateCoupon",vendorServices.addorUpdateCoupon);
+app.get("/vendor/getRegisterCoupons",vendorServices.getRegisterCoupons);
+app.get("/vendor/useUserCoupons",vendorServices.useUserCoupons);
 app.get("/getCoupon",mainServices.getCoupon);
-// app.post("/user/getBankAccounts",userFunctions.getBankAccounts);
+
 app.get('*', function(req, res){
 	res.send('hello world');
 });

@@ -1,6 +1,6 @@
-var httprequest = require('request');
-var helper = require('../utils/helper.js');
-var crypto    = require('crypto');
+let httprequest = require('request');
+let helper = require('../utils/helper.js');
+let crypto    = require('crypto');
 let algorithm = 'sha256';  
 exports.login = function (req, res) {
 	let api_key = req.get('api_key');
@@ -20,9 +20,35 @@ exports.login = function (req, res) {
 					console.log(err.message);
 					res.json(helper.setResponse(303, null, null));
 				} else {
-					console.log();	
+					
 					data =rows[1][0];
-					res.json(helper.setResponse(data.code, "",data.data));
+					data.data =JSON.parse(data.data);
+					console.log(data.data.vendor_id);	
+					if(data.code==200){
+
+						req.getConnection(function(err, connection) {
+							if(err){
+								console.log(err.message);
+								res.json(helper.setResponse(300,null,  null));
+								return;
+							}
+							queryStr='select * from coupons where vendor_id=?';
+							console.log(queryStr);
+							connection.query(queryStr,[data.data.vendor_id], function(err, c_rows) {
+								if (err) {
+									console.log(err.message);
+									res.json(helper.setResponse(303, null, null));
+								} else {
+									console.log();	
+									data.data.coupons=c_rows;
+									res.json(helper.setResponse(data.code, "",data.data));
+								} 
+							});
+
+						});
+
+					}else
+					res.json(helper.setResponse(data.code, "",null));
 				} 
 			});
 
@@ -30,30 +56,58 @@ exports.login = function (req, res) {
 	}else
 	res.json(helper.setResponse(201, null, null));
 }
-exports.addProduct = function (req, res) {
+
+
+exports.addorUpdateCoupon = function (req, res) {
 	let api_key = req.get('api_key');
 	let v_api_key = req.get('v_api_key');
 	let vendor_id = req.query.vendor_id;
-	var product_name =  req.query.product_name;
-	var product_price =  req.query.product_price;
-	var product_description =  req.query.product_description;
-	if ( typeof api_key !== 'undefined' &&  typeof v_api_key !== 'undefined' && typeof vendor_id !== 'undefined' && typeof product_name !== 'undefined'&& typeof product_price !== 'undefined'&& typeof product_description !== 'undefined') {
+	let coupon_name =  req.query.coupon_name;
+	let coupon_id =  req.query.coupon_id;
+	let description =  req.query.description;
+	let type_id =  req.query.type_id;
+	let discount =  req.query.discount;
+	let limit =  req.query.limit;
+	let start_date =  req.query.start_date;
+	let end_date =  req.query.end_date;
+	let image =  req.query.image;
+	if ( typeof api_key !== 'undefined' &&  typeof v_api_key !== 'undefined' && typeof vendor_id !== 'undefined' && typeof coupon_name !== 'undefined'&& typeof type_id !== 'undefined'&& typeof description !== 'undefined'&& typeof discount !== 'undefined' && typeof limit !== 'undefined' && typeof start_date !== 'undefined'&& typeof end_date !== 'undefined'&& typeof image !== 'undefined') {
 		req.getConnection(function(err, connection) {
 			if(err){
 				console.log(err.message);
 				res.json(helper.setResponse(300,null,  null));
 				return;
 			}
-			let queryStr="call ADD_PRODUCT(?,?,?,?,?,?,@code) ; SELECT @code as code";
+			let queryStr="call CHECK_VENDOR_ACCESS(?,?,?,@code) ; SELECT @code as code";
 			console.log(queryStr);
-			connection.query(queryStr,[api_key,v_api_key,vendor_id,product_name,product_price,product_description], function(err, rows) {
+			connection.query(queryStr,[api_key,v_api_key,vendor_id], function(err, rows) {
 				if (err) {
 					console.log(err.message);
 					res.json(helper.setResponse(303, null, null));
 				} else {
-					console.log();	
 					data =rows[1][0];
-					res.json(helper.setResponse(data.code, "",data.data));
+					if(data.code==200){
+						req.getConnection(function(err, connection) {
+							if(err){
+								console.log(err.message);
+								res.json(helper.setResponse(300,null,  null));
+								return;
+							}
+							queryStr='insert into coupons values(?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE coupon_name=?,description=?, type_id=?, discount=?, limit_count=? ,start_date=?,end_date=?';
+							console.log(queryStr);
+							connection.query(queryStr,[coupon_id,vendor_id,coupon_name,description,type_id,discount,limit,start_date,end_date,coupon_name,description,type_id,discount,limit,start_date,end_date], function(err, i_rows) {
+								if (err) {
+									console.log(err);
+									res.json(helper.setResponse(303, null, null));
+								} else {
+									console.log(i_rows);	
+									res.json(helper.setResponse(200, "",i_rows.insertId));
+								} 
+							});
+
+						});
+					}else
+					res.json(helper.setResponse(data.code, "",null));
 				} 
 			});
 
@@ -61,6 +115,112 @@ exports.addProduct = function (req, res) {
 	}else
 	res.json(helper.setResponse(201, null, null));
 }
+
+
+exports.getRegisterCoupons = function (req, res) {
+	let api_key = req.get('api_key');
+	let v_api_key = req.get('v_api_key');
+	let vendor_id = req.query.vendor_id;
+	if ( typeof api_key !== 'undefined' &&  typeof v_api_key !== 'undefined' && typeof vendor_id !== 'undefined') {
+		req.getConnection(function(err, connection) {
+			if(err){
+				console.log(err);
+				res.json(helper.setResponse(300,null,  null));
+				return;
+			}
+			let queryStr="call CHECK_VENDOR_ACCESS(?,?,?,@code) ; SELECT @code as code";
+			console.log(queryStr);
+			connection.query(queryStr,[api_key,v_api_key,vendor_id], function(err, rows) {
+				if (err) {
+					console.log(err);
+					res.json(helper.setResponse(303, null, null));
+				} else {
+					data =rows[1][0];
+					if(data.code==200){
+						req.getConnection(function(err, connection) {
+							if(err){
+								console.log(err);
+								res.json(helper.setResponse(300,null,  null));
+								return;
+							}
+							queryStr='SELECT c.type_id,c.coupon_name,c.description, uc.* FROM coupon.user_coupons uc left join coupons c on uc.coupon_id=c.id where c.vendor_id=? and is_valid="Y"';
+							console.log(queryStr);
+							connection.query(queryStr,[vendor_id], function(err, i_rows) {
+								if (err) {
+									console.log(err);
+									res.json(helper.setResponse(303, null, null));
+								} else {
+									console.log(i_rows);	
+									res.json(helper.setResponse(200, "",i_rows));
+								} 
+							});
+
+						});
+					}else
+					res.json(helper.setResponse(data.code, "",null));
+				} 
+			});
+
+		});
+	}else
+	res.json(helper.setResponse(201, null, null));
+}
+
+exports.useUserCoupons = function (req, res) {
+	let api_key = req.get('api_key');
+	let v_api_key = req.get('v_api_key');
+	let vendor_id = req.query.vendor_id;
+	let coupons = req.query.coupons +'';
+	if ( typeof api_key !== 'undefined' &&  typeof v_api_key !== 'undefined' && typeof vendor_id !== 'undefined') {
+		req.getConnection(function(err, connection) {
+			if(err){
+				console.log(err);
+				res.json(helper.setResponse(300,null,  null));
+				return;
+			}
+			let queryStr="call CHECK_VENDOR_ACCESS(?,?,?,@code) ; SELECT @code as code";
+			console.log(queryStr);
+			connection.query(queryStr,[api_key,v_api_key,vendor_id], function(err, rows) {
+				if (err) {
+					console.log(err);
+					res.json(helper.setResponse(303, null, null));
+				} else {
+					data =rows[1][0];
+					if(data.code==200){
+						req.getConnection(function(err, connection) {
+							if(err){
+								console.log(err);
+								res.json(helper.setResponse(300,null,  null));
+								return;
+							}
+						
+							queryStr='update user_coupons set is_used="Y" , used_date=CURRENT_TIMESTAMP where id in('+coupons+') and is_used!="Y"';
+								console.log(queryStr);
+							connection.query(queryStr, function(err, u_rows) {
+								if (err) {
+									console.log(err);
+									res.json(helper.setResponse(303, null, null));
+								} else {
+									console.log(u_rows);	
+									if(u_rows.affectedRows >0)
+									res.json(helper.setResponse(200, "",u_rows.affectedRows));
+									else
+									res.json(helper.setResponse(404, "",u_rows.affectedRows));
+
+								} 
+							});
+
+						});
+					}else
+					res.json(helper.setResponse(data.code, "",null));
+				} 
+			});
+
+		});
+	}else
+	res.json(helper.setResponse(201, null, null));
+}
+
 function getMillis(){
 	let d = new Date();
 	let millis = d.getTime();
@@ -68,7 +228,6 @@ function getMillis(){
 }
 
 function callBankService ( bank_api,bank_url,params){
-	
 	var hmac = crypto.createHmac(algorithm,params.currentmillis.toString());
 	let encryptData= bank_api+params.currentmillis;
 	let auth= hmac.update(encryptData.toString()).digest('hex');
@@ -81,83 +240,6 @@ function callBankService ( bank_api,bank_url,params){
 		},
 		body:  JSON.stringify(params)
 	};
-
 	return options;
-
 }
 
-
-
-
-exports.getAccntBalance = function (request, res) {
-
-	var auth = request.get('auth');
-	var user_name = request.body.user_name;
-	var register_number = request.body.register_number;
-	var account_number = request.body.account_number;
-	var currentmillis = request.body.currentmillis;
-
-	if (typeof auth !== 'undefined' && typeof user_name !== 'undefined' && typeof register_number !== 'undefined' && typeof account_number !== 'undefined' && typeof currentmillis !== 'undefined') {
-		var bindvarsapi = {
-			p_key: currentmillis,
-			p_data: user_name + register_number + account_number,
-			res: {type: 2001,dir: 3003},
-			code: {type: 2002,dir: 3003},
-			message: {type: 2001,dir: 3003}
-		};
-		request.getConnection(function (err, connection) {
-			if (err) {
-				res.json(helper.setResponse(500, err.message, null));
-				return;
-			}
-			connection.execute(
-				"BEGIN check_api(:p_key,:p_data,:res,:code,:message); END; ",
-				bindvarsapi,
-				function (err, result) {
-					if (err) {
-						res.json(helper.setResponse(501, err.message, null));
-						return;
-					}
-					if (result.outBinds.code == '200') {
-						if (result.outBinds.res == auth) {
-							var bindvars = {
-								user_name: user_name,
-								register_number: register_number,
-								account_number: account_number,
-								accnt_balance: {type: 2001,dir: 3003},
-								code: {type: 2002,dir: 3003},
-								message: {type: 2001,dir: 3003}
-							};
-							request.getConnection(function (err, connection) {
-								if (err) {
-									res.json(helper.setResponse(500, err.message, null));
-									return;
-								}
-								connection.execute(
-									"BEGIN getaccntbalance(:user_name,:register_number,:account_number,:accnt_balance,:code,:message); END; ",
-									bindvars,
-									function (err, result) {
-										if (err) {
-											res.json(helper.setResponse(501, err.message, null));
-											return;
-										}
-										var data = {
-											accnt_balance: result.outBinds.accnt_balance
-										};
-										res.json(helper.setResponse(200, '', data));
-									});
-							})
-						} else {
-							res.json(helper.setResponse(505, null, null));
-							return;
-						}
-					} else {
-						res.json(helper.setResponse(result.outBinds.code, result.outBinds.message, null));
-						return;
-					}
-				});
-		})
-	} else {
-		res.json(helper.setResponse(504, null, null));
-	}
-}

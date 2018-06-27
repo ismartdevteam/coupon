@@ -16,13 +16,13 @@ BEGIN
     declare d_vendor_name varchar(255);
     declare d_vendor_intro varchar(1000);
 	declare d_vendor_id int;
-    declare d_products JSON;
+
     SELECT count(1) into count_api from api_keys where type_id=0 and api_key=r_key;
     if count_api >0 then
 		select  
-		id , vendor_name,vendor_intro ,vendor_products
+		id , vendor_name,vendor_intro 
         into
-        d_vendor_id, d_vendor_name, d_vendor_intro,d_products
+        d_vendor_id, d_vendor_name, d_vendor_intro
         from vendors a where a.username =r_username and a.password=r_pass limit 1;
 		
         if d_vendor_id is not null then
@@ -32,7 +32,7 @@ BEGIN
 			 JSON_OBJECT('vendor_id',d_vendor_id ),
 			   JSON_OBJECT('vendor_name',d_vendor_name ),
 					JSON_OBJECT('vendor_intro',d_vendor_intro ),
-							JSON_OBJECT('vendor_products',d_products ),
+							
 					   JSON_OBJECT('vendor_api_key',a.api_key )
 						
 			) into o_data

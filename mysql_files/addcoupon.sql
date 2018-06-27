@@ -1,5 +1,5 @@
 
-DROP PROCEDURE ADD_PRODUCT;
+DROP PROCEDURE ADD_COUPON;
 DELIMITER $$
  
 CREATE PROCEDURE ADD_COUPON(
@@ -7,6 +7,7 @@ IN r_key varchar(45),
 IN r_vendor_key varchar(45),
 IN r_vendor_id int,
 IN r_coupon_name varchar(255),
+IN r_coupon_desc varchar(1000),
 IN r_type_id int,
 IN r_discount varchar(45),
 IN r_limit int,
@@ -24,9 +25,9 @@ BEGIN
     into 
     count_api,d_vendor_key;
     if count_api >0 and d_vendor_key = r_vendor_key then
-	update vendors  set vendor_products = JSON_ARRAY_APPEND(coupons,'$',JSON_OBJECT( 'coupon_id',HEX(AES_ENCRYPT(123, r_coupon_name)),
-    'coupon_name',r_coupon_name,'type_id',r_type_id,'discount',r_discount,'limit',r_limit,'discount',r_discount,'start_date',r_start_date,
-    'end_date',r_end_date,'image_url', r_image,'created_date',current_timestamp())) where id=r_vendor_id;
+	update vendors  set coupons = JSON_ARRAY_APPEND(coupons,'$',JSON_OBJECT( 'coupon_id',HEX(AES_ENCRYPT(123, current_timestamp())),
+    'coupon_name',r_coupon_name,'description',r_coupon_desc,'type_id',r_type_id,'discount',r_discount,'limit',r_limit,'discount',r_discount,'start_date',STR_TO_DATE(r_start_date,'%Y-%m-%d'),
+    'end_date', STR_TO_DATE(r_end_date,'%Y-%m-%d'),'image_url', r_image,'created_date',current_timestamp())) where id=r_vendor_id;
 			set o_code =200;
     else
 		set o_code =401;

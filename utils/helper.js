@@ -10,6 +10,7 @@ var setResponse= exports.setResponse = function (code,msg, data) {
     case 201:
     response.message="mismatch params";
     break;
+    
     case 300:
     response.message="error connection: "+msg;
     break;
@@ -46,9 +47,7 @@ var setResponse= exports.setResponse = function (code,msg, data) {
     response.message="unknown error: "+msg;
 
   }
-
   response.data=data;
-
   return response;
 
 
