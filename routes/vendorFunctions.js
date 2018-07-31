@@ -205,14 +205,12 @@ exports.couponImageUpload=function(req, res) {
 
   }); 
 };
-function replaceAll(str, find, replace) {
-	return str.replace(new RegExp(find, 'g'), replace);
-}
 
-exports.couponImageDelete=function(req, res) {
-	let coupon_id = req.get('coupon_id');
-	let url = req.get('url');
-	console.log(coupon_id,url);
+
+exports.imageDelete = function(req, res) {
+	var coupon_id = req.query.coupon_id;
+	var url = req.query.url;
+	
 	if ( typeof url !== 'undefined' && typeof coupon_id !== 'undefined')
 	{
 		req.getConnection(function(err, connection) {
@@ -361,3 +359,6 @@ function callBankService ( bank_api,bank_url,params){
 	return options;
 }
 
+function replaceAll(str, find, replace) {
+	return str.replace(new RegExp(find, 'g'), replace);
+};

@@ -40,7 +40,7 @@ app.get("/vendor/addorUpdateCoupon",vendorServices.addorUpdateCoupon);
 app.get("/vendor/getRegisterCoupons",vendorServices.getRegisterCoupons);
 app.get("/vendor/useUserCoupons",vendorServices.useUserCoupons);
 app.get("/getCoupon",mainServices.getCoupon);
-app.get('/coupon/deleteImage', vendorServices.couponImageDelete);
+app.get('/coupon/deleteImage', vendorServices.imageDelete);
 app.post('/coupon/imageUpload', vendorServices.couponImageUpload);
 
 
