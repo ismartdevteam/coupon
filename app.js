@@ -2,14 +2,21 @@ let express = require("express");
 let logger = require("express-logger");
 let session = require("express-session");
 let bodyParser = require("body-parser");
-myConnection = require('express-myconnection');
 
+myConnection = require('express-myconnection');
+const fileUpload = require('express-fileupload');
 let helmet = require('helmet');
 let mainServices = require('./routes/services');
 let vendorServices = require('./routes/vendorFunctions');
 let mysql      = require('mysql');
+var path = require('path');
 dbOptions = require('./utils/dbconfig.js');
-let app = express();
+const app = express();
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(fileUpload({
+  limits: { fileSize: 5 * 1024 * 1024 },
+  safeFileNames: /\\/g 
+}));
 app.use(myConnection(mysql, dbOptions, 'request'));
 
 
@@ -33,6 +40,8 @@ app.get("/vendor/addorUpdateCoupon",vendorServices.addorUpdateCoupon);
 app.get("/vendor/getRegisterCoupons",vendorServices.getRegisterCoupons);
 app.get("/vendor/useUserCoupons",vendorServices.useUserCoupons);
 app.get("/getCoupon",mainServices.getCoupon);
+app.post('/coupon/imageUpload', vendorServices.couponImageUpload);
+app.post('/coupon/deleteImage', vendorServices.couponImageDelete);
 
 app.get('*', function(req, res){
 	res.send('hello world');

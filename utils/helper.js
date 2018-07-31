@@ -36,12 +36,15 @@ var setResponse= exports.setResponse = function (code,msg, data) {
     case 403:
     response.message="request expired";
     break;
+    case 500:
+    response.message="server error:"+msg;
     case 501:
     response.message="error while running procedure:"+msg;
     break;
 
     case 601:
     response.message="no bank details found:"+msg;
+
     break;
     default:
     response.message="unknown error: "+msg;
