@@ -166,6 +166,55 @@ exports.getRegisterCoupons = function (req, res) {
 	res.json(helper.setResponse(201, null, null));
 }
 
+exports.getCoupons = function (req, res) {
+	let api_key = req.get('api_key');
+	let v_api_key = req.get('v_api_key');
+	let vendor_id = req.query.vendor_id;
+	if ( typeof api_key !== 'undefined' &&  typeof v_api_key !== 'undefined' && typeof vendor_id !== 'undefined') {
+		req.getConnection(function(err, connection) {
+			if(err){
+				console.log(err);
+				res.json(helper.setResponse(300,null,  null));
+				return;
+			}
+			let queryStr="call CHECK_VENDOR_ACCESS(?,?,?,@code) ; SELECT @code as code";
+			console.log(queryStr);
+			connection.query(queryStr,[api_key,v_api_key,vendor_id], function(err, rows) {
+				if (err) {
+					console.log(err);
+					res.json(helper.setResponse(303, null, null));
+				} else {
+					data =rows[1][0];
+					if(data.code==200){
+						req.getConnection(function(err, connection) {
+							if(err){
+								console.log(err);
+								res.json(helper.setResponse(300,null,  null));
+								return;
+							}
+							queryStr='SELECT c.* from coupons c where c.vendor_id=? ';
+							console.log(queryStr);
+							connection.query(queryStr,[vendor_id], function(err, i_rows) {
+								if (err) {
+									console.log(err);
+									res.json(helper.setResponse(303, null, null));
+								} else {
+									console.log(i_rows);	
+									res.json(helper.setResponse(200, "",i_rows));
+								} 
+							});
+
+						});
+					}else
+					res.json(helper.setResponse(data.code, "",null));
+				} 
+			});
+
+		});
+	}else
+	res.json(helper.setResponse(201, null, null));
+}
+
 exports.useUserCoupons = function (req, res) {
 	let api_key = req.get('api_key');
 	let v_api_key = req.get('v_api_key');

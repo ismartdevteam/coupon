@@ -1,6 +1,8 @@
 var httprequest = require('request');
 var MobileDetect = require('mobile-detect');
 exports.getCoupon = function (request, res) {
+	var api_key = request.get('api_key');
+	var user_id = request.body.user_id;
 md = new MobileDetect(request.headers['user-agent']);
   res.send("Hi to "+md.os() + md.is('iPhone')+" User");
 	// var auth = request.get('auth');

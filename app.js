@@ -28,6 +28,7 @@ app.get('/', function(req, res){
 	res.send('hello world');
 });
 app.get("/vendor/login",vendorServices.login);
+app.get("/vendor/getCoupons",vendorServices.getCoupons);
 app.get("/vendor/addorUpdateCoupon",vendorServices.addorUpdateCoupon);
 app.get("/vendor/getRegisterCoupons",vendorServices.getRegisterCoupons);
 app.get("/vendor/useUserCoupons",vendorServices.useUserCoupons);
