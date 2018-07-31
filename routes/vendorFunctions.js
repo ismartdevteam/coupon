@@ -95,7 +95,7 @@ exports.addorUpdateCoupon = function (req, res) {
 								res.json(helper.setResponse(300,null,  null));
 								return;
 							}
-							queryStr='insert into coupons(coupon_id,vendor_id,coupon_name,description,type_id,discount,limit,start_date,end_date) values(?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE coupon_name=?,description=?, type_id=?, discount=?, limit_count=? ,start_date=?,end_date=?';
+							queryStr='insert into coupons(id,vendor_id,coupon_name,description,type_id,discount,limit_count,start_date,end_date) values(?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE coupon_name=?,description=?, type_id=?, discount=?, limit_count=? ,start_date=?,end_date=?';
 							console.log(queryStr);
 							connection.query(queryStr,[coupon_id,vendor_id,coupon_name,description,type_id,discount,limit,start_date,end_date,coupon_name,description,type_id,discount,limit,start_date,end_date], function(err, i_rows) {
 								if (err) {
