@@ -191,7 +191,7 @@ exports.couponImageUpload=function(req, res) {
   			res.json(helper.setResponse(300,null,  null));
   			return;
   		}
-  		let queryStr="update  coupons set images=concat(images,'~',?) where id=?";
+  		let queryStr="update  coupons set images=concat(COALESCE(images,''),'~',?) where id=?";
   		console.log(queryStr);
   		connection.query(queryStr,['uploads/'+coupon_id+'/'+fileName,coupon_id], function(err, rows) {
   			if (err) {
