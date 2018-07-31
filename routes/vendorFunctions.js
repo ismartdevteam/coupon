@@ -210,9 +210,10 @@ function replaceAll(str, find, replace) {
 }
 
 exports.couponImageDelete=function(req, res) {
-	let coupon_id = req.body.coupon_id;
-	let url = req.body.url;
-	if ( typeof url !== 'undefined'&& typeof coupon_id !== 'undefined')
+	let coupon_id = req.get('coupon_id');
+	let url = req.get('url');
+	console.log(coupon_id,url);
+	if ( typeof url !== 'undefined' && typeof coupon_id !== 'undefined')
 	{
 		req.getConnection(function(err, connection) {
 			if(err){
@@ -220,7 +221,7 @@ exports.couponImageDelete=function(req, res) {
 				return res.json(helper.setResponse(300,null,  null));
 			}
 			let queryStr="update  coupons set images=REPLACE(images,?,'') where id=?";
-			connection.query(queryStr,[url,coupon_id], function(err, rows) {
+			connection.query(queryStr,["~"+url,coupon_id], function(err, rows) {
 				if (err) {
 					console.log(err.message);
 					res.json(helper.setResponse(303, null, null));

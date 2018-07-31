@@ -40,8 +40,9 @@ app.get("/vendor/addorUpdateCoupon",vendorServices.addorUpdateCoupon);
 app.get("/vendor/getRegisterCoupons",vendorServices.getRegisterCoupons);
 app.get("/vendor/useUserCoupons",vendorServices.useUserCoupons);
 app.get("/getCoupon",mainServices.getCoupon);
+app.get('/coupon/deleteImage', vendorServices.couponImageDelete);
 app.post('/coupon/imageUpload', vendorServices.couponImageUpload);
-app.post('/coupon/deleteImage', vendorServices.couponImageDelete);
+
 
 app.get('*', function(req, res){
 	res.send('hello world');
